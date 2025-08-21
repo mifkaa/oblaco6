@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        .grid {
+            position: absolute;
+            /* height: 100vh; */
+            /* height: 3510px; */
+            height: 100%;
+            width: 1600px;
+
+            background-color: #379bc2;
+
+            left: 50%;
+            transform: translate(-50%);
+        }
+
+        .div {
+            transition: all 2.6s;
+            position: absolute;
+
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            height: 200px;
+
+            background-color: #3ba9ff;
+            z-index: 1000;
+        }
+
+        .div.max {
+            width: 1400px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid">
+        <div class="div"></div>
+    </div>
+
+    <script>
+        const body = document.querySelector('body')
+        const div = document.querySelector('.div')
+
+        body.addEventListener('click', () => {
+            div.classList.add('max');
+        })
+
+    </script>
+</body>
+
+</html>

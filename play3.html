@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра с таймером и реплеем</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .gameContainerB {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border-radius: 40px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid #fff;
+            background-color: #fff;
+        }
+
+        .gameContainerB .game {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 40px;
+            overflow: hidden;
+        }
+
+        .gameContainerB .player {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: transform 0.1s ease-out;
+            z-index: 10;
+        }
+
+        .gameContainerB .player img,
+        .gameContainerB #replay-player img {
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            height: 65px;
+            transform: translateX(-50%);
+        }
+
+
+
+        .gameContainerB .key {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 65px;
+            border-radius: 50%;
+            z-index: 5;
+        }
+
+        .gameContainerB .key img {
+            position: absolute;
+            height: 30px;
+            width: 30px;
+            left: -5px;
+            top: -5px;
+            rotate: 51deg;
+        }
+
+        .gameContainerB .door {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            width: 42px;
+            height: 25px;
+            bottom: 44px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 4px;
+            z-index: 2;
+        }
+
+        .gameContainerB .door img {
+            position: absolute;
+            width: 66px;
+            height: 66px;
+            bottom: 0;
+            border-radius: 4px;
+        }
+
+        .gameContainerB .wall {
+            position: absolute;
+
+            background: #222;
+            border-radius: 50%;
+            border: 2px solid #fff;
+
+            z-index: 3;
+        }
+
+        .gameContainerB .topWall .wall {
+            width: 150px;
+            height: 150px;
+        }
+
+        .gameContainerB .topWall .wall1 {
+            top: 46px;
+            left: 46px;
+        }
+
+        .gameContainerB .topWall .wall2 {
+            top: 46px;
+            right: 46px;
+        }
+
+        .gameContainerB .botWall .wall {
+            width: 400px;
+            height: 400px;
+        }
+
+        .gameContainerB .botWall .wall1 {
+            bottom: -220px;
+            left: -220px;
+        }
+
+        .gameContainerB .botWall .wall2 {
+            bottom: -220px;
+            right: -220px;
+        }
+
+        .gameContainerB .noStepl {
+            position: absolute;
+            width: 90px;
+            height: 220px;
+            background: #ff000058;
+            left: 0;
+            top: 0;
+            z-index: 3;
+        }
+
+        .gameContainerB .noStepr {
+            position: absolute;
+            width: 90px;
+            height: 220px;
+            background: #ff000058;
+            right: 0;
+            top: 0;
+            z-index: 3;
+        }
+
+        .gameContainerB .timer {
+            position: absolute;
+            bottom: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #333;
+            z-index: 20;
+        }
+
+        .gameContainerB .timerContainer {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+
+        .gameContainerB .timerCircle {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border: 4px solid #ddd;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .gameContainerB .timerHand {
+            position: absolute;
+            left: 50%;
+            top: calc(50% - 2px);
+            width: 40%;
+            height: 4px;
+            border-radius: 2px;
+            background: #3498db;
+            transform-origin: left center;
+            transform: rotate(-90deg);
+        }
+
+        .gameContainerB .timerCenter {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 6px;
+            height: 6px;
+            background: #3498db;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .gameContainerB .timerText {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            opacity: 0;
+        }
+
+        .gameContainerB .trail-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: rgb(255, 100, 172);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .gameContainerB #replay-player {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            z-index: 15;
+        }
+
+        /* @keyframes jump {
+
+            0%,
+            100% {
+                transform: translateY(0) rotateX(0);
+            }
+
+            50% {
+                transform: translateY(-4px) rotateX(20deg);
+            }
+        }
+
+        .jumping {
+            animation: jump 0.2s infinite ease-in-out;
+        } */
+    </style>
+</head>
+
+<body>
+    <div class="gameContainerB">
+        <div class="game">
+            <div class="player">
+                <img class="pl1" src="style/chel1.png" alt="">
+                <img class="pl2" src="style/chel2.png" alt="">
+            </div>
+            <div class="key">
+                <img class="key1" src="style/key2.png" alt="">
+                <img class="key2" src="style/key1.png" alt="">
+            </div>
+            <div class="door">
+                <img class="def" src="style/doorDef.png" alt="">
+                <img class="close" src="style/doorClose.png" alt="">
+                <img class="open" src="style/doorOpen.png" alt="">
+            </div>
+            <div class="topWall">
+                <div class="wall wall1"></div>
+                <div class="wall wall2"></div>
+            </div>
+
+            <div class="botWall">
+                <div class="wall wall1"></div>
+                <div class="wall wall2"></div>
+            </div>
+
+            <div class="noStepl"></div>
+            <div class="noStepr"></div>
+        </div>
+        <div class="timer">
+            <div class="timerContainer">
+                <div class="timerCircle">
+                    <div class="timerHand"></div>
+                    <div class="timerCenter"></div>
+                    <div class="timerText">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gameContainer = document.querySelector('.gameContainerB');
+        const player = document.querySelector('.player');
+        const pl1 = document.querySelector('.player .pl1');
+        const pl2 = document.querySelector('.player .pl2');
+        const key = document.querySelector('.key');
+        const key1 = document.querySelector('.key .key1');
+        const key2 = document.querySelector('.key .key2');
+        const door = document.querySelector('.door');
+        const doorDef = document.querySelector('.door .def');
+        const doorClose = document.querySelector('.door .close');
+        const doorOpen = document.querySelector('.door .open');
+        const wall = document.querySelector('.wall');
+        const noStepl = document.querySelector('.noStepl');
+        const noStepr = document.querySelector('.noStepr');
+        const game = document.querySelector('.game');
+        const timer = document.querySelector('.timer');
+        const timerHand = document.querySelector('.timerHand');
+        const timerText = document.querySelector('.timerText');
+        let seconds = 0;
+
+        // Настройки игры
+        const config = {
+            playerSize: 40,
+            keySize: 20,
+            doorWidth: 42,
+            doorHeight: 25,
+            wallRadiusTop: 75,
+            wallRadiusBot: 200,
+            noStepSize: 80,
+            gameWidth: 400,
+            gameHeight: 400,
+            cornerRadius: 40,
+            roundTime: 6.3 // Время на раунд в секундах
+        };
+
+        // Состояние игры
+        let state = {
+            playerX: 200 - 20,
+            playerY: 320,
+            velX: 0,
+            velY: 0,
+            speed: 0.5,
+            friction: 0.92,
+            maxSpeed: 6,
+            hasKey: false,
+            timeLeft: config.roundTime,
+            timerInterval: null,
+            isGameOver: false,
+            restartTimer: null,
+            gameSuccess: false, // Флаг1: успешное завершение
+            // enableRewind: false, // Флаг2: включить перемотку
+            enableRewind: true, // Флаг2: включить перемотку
+            recordedFrames: [], // Запись позиций игрока
+            isReplaying: false,
+            replayTrail: [], // Точки траектории реплея
+            isNoStepl: false,
+            isNoSteplDop: false,
+            isNoStepr: false,
+            isNoSteprDop: false
+        };
+
+        // Управление
+        const keys = {};
+        document.addEventListener('keydown', (e) => {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                keys[e.key] = true;
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                keys[e.key] = false;
+            }
+        });
+
+        // Инициализация игры
+        function initGame() {
+
+            player.classList.remove('jumping');
+            player.style.transform = 'none';
+
+            // Очищаем предыдущие интервалы
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            if (state.restartTimer) clearTimeout(state.restartTimer);
+
+            // Очищаем реплей
+            clearReplay();
+
+            // Сброс состояния
+            state = {
+                ...state,
+                playerX: 200 - 20,
+                playerY: 320,
+                velX: 0,
+                velY: 0,
+                hasKey: false,
+                timeLeft: config.roundTime,
+                isGameOver: false,
+                gameSuccess: false,
+                recordedFrames: [],
+                isReplaying: false,
+                isNoStepl: false,
+                isNoSteplDop: false,
+                isNoStepr: false,
+                isNoSteprDop: false
+            };
+
+            // Сброс элементов
+            player.style.left = state.playerX + 'px';
+            player.style.top = state.playerY + 'px';
+            player.style.display = 'block';
+            pl2.style.display = 'none';
+            pl1.style.display = 'block';
+            key2.style.display = 'none';
+            key1.style.display = 'block';
+
+            doorDef.style.display = 'none';
+            doorOpen.style.display = 'none';
+            doorClose.style.display = 'block';
+
+            noStepl.style.display = 'block'
+            noStepr.style.display = 'block'
+
+            player.style.transform = 'none';
+            timerText.textContent = state.timeLeft;
+            gameContainer.style.background = '#fff'
+            timer.style.display = 'block'
+
+
+            // Размещение ключа
+            placeKey();
+
+            // Сброс управления
+            keys['ArrowUp'] = false;
+            keys['ArrowDown'] = false;
+            keys['ArrowLeft'] = false;
+            keys['ArrowRight'] = false;
+
+            // Запуск таймера
+            state.timerInterval = setInterval(updateTimer, 100);
+        }
+
+        // Размещение ключа
+        function placeKey() {
+
+            key.style.display = 'block';
+        }
+
+        // Обновление таймера
+        function updateTimer() {
+
+            state.timeLeft = state.timeLeft - 1 / 10;
+            timerText.textContent = state.timeLeft;
+
+            const angle = (-state.timeLeft / config.roundTime) * 360 - 90; // -90 чтобы начинать с вертикального положения
+            timerHand.style.transform = `rotate(${angle}deg)`;
+
+            if (state.timeLeft <= 0) {
+
+                setTimeout(() => {
+                    state.timeLeft = config.roundTime
+                    timerText.textContent = state.timeLeft;
+                    const angle = (-state.timeLeft / config.roundTime) * 360 - 90; // -90 чтобы начинать с вертикального положения
+                    timerHand.style.transform = `rotate(${angle}deg)`;
+                }, 100);
+
+                endGame(false);
+            }
+        }
+
+        // Запись позиции игрока
+        function recordFrame() {
+            if (!state.isGameOver && !state.isReplaying) {
+                state.recordedFrames.push({
+                    x: state.playerX,
+                    y: state.playerY
+                });
+            }
+        }
+
+        // Очистка реплея
+        function clearReplay() {
+            const replayPlayer = document.getElementById('replay-player');
+            if (replayPlayer) replayPlayer.remove();
+
+            state.replayTrail.forEach(dot => dot.remove());
+            state.replayTrail = [];
+            state.isReplaying = false;
+        }
+
+        // Создание точки траектории
+        function createTrailDot(x, y) {
+            const dot = document.createElement('div');
+            dot.className = 'trail-dot';
+            dot.style.left = x + 'px';
+            dot.style.top = y + 'px';
+            gameContainer.appendChild(dot);
+            return dot;
+        }
+
+        // Начать реплей с перемоткой
+        function startReplay() {
+            if (state.recordedFrames.length === 0) return;
+
+            state.isReplaying = true;
+            player.style.display = 'none';
+
+            // Создаем клона для воспроизведения
+            const replayPlayer = document.createElement('div');
+            // Создаем элемент img
+            const imgElement = document.createElement('img');
+            imgElement.src = 'style/chel1.png';
+
+            // Добавляем изображение в DOM (например, в body)
+            document.body.appendChild(imgElement);
+            replayPlayer.id = 'replay-player';
+            replayPlayer.style.left = state.playerX + 'px';
+            replayPlayer.style.top = state.playerY + 'px';
+            gameContainer.appendChild(replayPlayer);
+            replayPlayer.appendChild(imgElement);
+
+            // Быстрая перемотка назад
+            rewindToStart();
+        }
+
+        // Перемотка в начало
+        function rewindToStart() {
+            let rewindIndex = state.recordedFrames.length - 1;
+            const rewindInterval = setInterval(() => {
+                if (rewindIndex <= 0) {
+                    clearInterval(rewindInterval);
+                    playForward(); // Запускаем обычное воспроизведение
+                    return;
+                }
+
+                rewindIndex -= 5; // Скорость перемотки
+                if (rewindIndex < 0) rewindIndex = 0;
+
+                const frame = state.recordedFrames[rewindIndex];
+                document.getElementById('replay-player').style.left = frame.x + 'px';
+                document.getElementById('replay-player').style.top = frame.y + 'px';
+            }, 16); // ~60fps
+        }
+
+        // Воспроизведение вперед
+        function playForward() {
+            let forwardIndex = 0;
+            const replayInterval = setInterval(() => {
+                if (forwardIndex >= state.recordedFrames.length) {
+                    clearInterval(replayInterval);
+                    setTimeout(() => initGame(), 2000); // Перезапуск через 2 секунды
+                    return;
+                }
+
+                const frame = state.recordedFrames[forwardIndex];
+                const replayPlayer = document.getElementById('replay-player');
+                replayPlayer.style.left = frame.x + 'px';
+                replayPlayer.style.top = frame.y + 'px';
+
+                // Добавляем точку траектории
+                if (forwardIndex % 1 === 0) {
+                    const dot = createTrailDot(frame.x + 14, frame.y + 14);
+                    state.replayTrail.push(dot);
+                }
+
+                forwardIndex++;
+            }, 16); // Оригинальная скорость
+        }
+
+        // Проверка столкновений
+        function checkCollisions() {
+            const playerCenter = {
+                x: state.playerX + config.playerSize / 2,
+                y: state.playerY + config.playerSize / 2
+            };
+
+            const wallCenterTop1 = {
+                x: 46 + 75,
+                y: 46 + 75
+            };
+
+            const wallCenterTop2 = {
+                x: config.gameWidth - 46 - 75,
+                y: 46 + 75
+            };
+
+
+            const wallCenterBot1 = {
+                x: -20,
+                y: config.gameHeight + 20
+            };
+
+            const wallCenterBot2 = {
+                x: config.gameWidth + 20,
+                y: config.gameHeight + 20
+            };
+
+            // 1. Проверка сбора ключа
+            if (!state.hasKey && isColliding(player, key)) {
+                key.style.display = 'none';
+                state.hasKey = true;
+                doorDef.style.display = 'none';
+                doorOpen.style.display = 'block';
+                doorClose.style.display = 'none';
+                // door.style.backgroundColor = '#34A853';
+            }
+
+            // 1. Проверка
+            if (!state.isNoStepl && isColliding(player, noStepl)) {
+                state.isNoStepl = true;
+            }
+
+            else if (state.hasKey && !state.isNoStepr && isColliding(player, noStepl)) {
+                state.isNoSteplDop = true;
+                if (state.timerInterval) clearInterval(state.timerInterval);
+                noStepl.style.display = 'none'
+                state.timerInterval = setInterval(updateTimer,25);
+            }
+
+            if (!state.isNoStepr && isColliding(player, noStepr)) {
+                state.isNoStepr = true;
+            }
+
+            else if (state.hasKey && !state.isNoStepl && isColliding(player, noStepr)) {
+                state.isNoSteprDop = true;
+                if (state.timerInterval) clearInterval(state.timerInterval);
+                noStepr.style.display = 'none'
+                state.timerInterval = setInterval(updateTimer, 25);
+            }
+
+            // 2. Проверка входа в дверь
+            if (state.hasKey && isColliding(player, door)) {
+                state.gameSuccess = true; // Устанавливаем флаг успеха
+                endGame(true);
+            }
+
+            // 3. Проверка столкновения с круглой стеной
+            checkWallCollisionTop(playerCenter, wallCenterTop1);
+            checkWallCollisionTop(playerCenter, wallCenterTop2);
+            checkWallCollisionBot(playerCenter, wallCenterBot1);
+            checkWallCollisionBot(playerCenter, wallCenterBot2);
+
+            // 4. Проверка границ игрового поля
+            checkBoundaryCollision(playerCenter);
+        }
+
+        // Проверка столкновения с круглой стеной
+        function checkWallCollisionTop(playerCenter, wallCenter) {
+            const dx = playerCenter.x - wallCenter.x;
+            const dy = playerCenter.y - wallCenter.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistanceTop = config.wallRadiusTop + config.playerSize / 2;
+
+            if (distance < minDistanceTop) {
+                const nx = dx / distance;
+                const ny = dy / distance;
+                const dotProduct = state.velX * nx + state.velY * ny;
+                state.velX -= nx * dotProduct * 0.85;
+                state.velY -= ny * dotProduct * 0.85;
+                const repel = (minDistanceTop - distance) * 0.1;
+                state.velX += nx * repel;
+                state.velY += ny * repel;
+                state.playerX = wallCenter.x + nx * minDistanceTop - config.playerSize / 2;
+                state.playerY = wallCenter.y + ny * minDistanceTop - config.playerSize / 2;
+            }
+        }
+
+        // Проверка столкновения с круглой стеной
+        function checkWallCollisionBot(playerCenter, wallCenter) {
+            const dx = playerCenter.x - wallCenter.x;
+            const dy = playerCenter.y - wallCenter.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistanceBot = config.wallRadiusBot + config.playerSize / 2;
+
+            if (distance < minDistanceBot) {
+                const nx = dx / distance;
+                const ny = dy / distance;
+                const dotProduct = state.velX * nx + state.velY * ny;
+                state.velX -= nx * dotProduct * 0.85;
+                state.velY -= ny * dotProduct * 0.85;
+                const repel = (minDistanceBot - distance) * 0.1;
+                state.velX += nx * repel;
+                state.velY += ny * repel;
+                state.playerX = wallCenter.x + nx * minDistanceBot - config.playerSize / 2;
+                state.playerY = wallCenter.y + ny * minDistanceBot - config.playerSize / 2;
+            }
+        }
+
+        // Проверка столкновения с границами
+        function checkBoundaryCollision(playerCenter) {
+            const cornerRadius = config.cornerRadius;
+            const width = config.gameWidth;
+            const height = config.gameHeight;
+            const playerRadius = config.playerSize / 2;
+            const effectiveRadius = cornerRadius - playerRadius;
+
+            let inCorner = false;
+            let cornerCenter = { x: 0, y: 0 };
+
+            if (playerCenter.x < cornerRadius && playerCenter.y < cornerRadius) {
+                inCorner = true;
+                cornerCenter = { x: cornerRadius, y: cornerRadius };
+            }
+            else if (playerCenter.x > width - cornerRadius && playerCenter.y < cornerRadius) {
+                inCorner = true;
+                cornerCenter = { x: width - cornerRadius, y: cornerRadius };
+            }
+            else if (playerCenter.x < cornerRadius && playerCenter.y > height - cornerRadius) {
+                inCorner = true;
+                cornerCenter = { x: cornerRadius, y: height - cornerRadius };
+            }
+            else if (playerCenter.x > width - cornerRadius && playerCenter.y > height - cornerRadius) {
+                inCorner = true;
+                cornerCenter = { x: width - cornerRadius, y: height - cornerRadius };
+            }
+
+            if (inCorner) {
+                const dx = playerCenter.x - cornerCenter.x;
+                const dy = playerCenter.y - cornerCenter.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance > effectiveRadius) {
+                    const nx = dx / distance;
+                    const ny = dy / distance;
+                    state.playerX = cornerCenter.x + nx * effectiveRadius - playerRadius;
+                    state.playerY = cornerCenter.y + ny * effectiveRadius - playerRadius;
+                    const dotProduct = state.velX * nx + state.velY * ny;
+                    state.velX -= nx * dotProduct * 1.5;
+                    state.velY -= ny * dotProduct * 1.5;
+                }
+            } else {
+                if (state.playerX < 0) {
+                    state.playerX = 0;
+                    state.velX *= -0.5;
+                }
+                if (state.playerX > width - config.playerSize) {
+                    state.playerX = width - config.playerSize;
+                    state.velX *= -0.5;
+                }
+                if (state.playerY < 0) {
+                    state.playerY = 0;
+                    state.velY *= -0.5;
+                }
+                if (state.playerY > height - config.playerSize) {
+                    state.playerY = height - config.playerSize;
+                    state.velY *= -0.5;
+                }
+            }
+        }
+
+        // Проверка столкновения двух элементов
+        function isColliding(el1, el2) {
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+            return (
+                rect1.left < rect2.right &&
+                rect1.right > rect2.left &&
+                rect1.top < rect2.bottom &&
+                rect1.bottom > rect2.top
+            );
+        }
+
+        // Завершение игры
+        function endGame(success) {
+            if (state.isGameOver) return;
+            state.isGameOver = true;
+            state.gameSuccess = success;
+
+            clearInterval(state.timerInterval);
+            // player.style.display = 'none';
+            gameContainer.style.background = '#222'
+            pl1.style.display = 'none';
+            pl2.style.display = 'block';
+            key1.style.display = 'none';
+            key2.style.display = 'block';
+
+            doorDef.style.display = 'block';
+            doorOpen.style.display = 'none';
+            doorClose.style.display = 'none';
+
+            // Сброс управления
+            keys['ArrowUp'] = false;
+            keys['ArrowDown'] = false;
+            keys['ArrowLeft'] = false;
+            keys['ArrowRight'] = false;
+
+            if (success) {
+                // message.textContent = `Успех! Уровень пройден!`;
+                if (state.enableRewind) {
+                    startReplay();
+                    return;
+                }
+            } else {
+                // message.textContent = `Время вышло!`;
+            }
+
+            timer.style.display = 'none'
+            state.restartTimer = setTimeout(initGame, 1000);
+        }
+
+        // Игровой цикл
+        function gameLoop() {
+            if (state.isGameOver || state.isReplaying) {
+
+                requestAnimationFrame(gameLoop);
+                console.log('уровень пройден')
+                return;
+            }
+            // Управление
+            if (keys['ArrowUp']) state.velY -= state.speed;
+            if (keys['ArrowDown']) state.velY += state.speed;
+            if (keys['ArrowLeft']) state.velX -= state.speed;
+            if (keys['ArrowRight']) state.velX += state.speed;
+
+            // Инерция
+            state.velX *= state.friction;
+            state.velY *= state.friction;
+
+            // Ограничение скорости
+            const currentSpeed = Math.sqrt(state.velX * state.velX + state.velY * state.velY);
+            if (currentSpeed > state.maxSpeed) {
+                state.velX = (state.velX / currentSpeed) * state.maxSpeed;
+                state.velY = (state.velY / currentSpeed) * state.maxSpeed;
+            }
+
+            // Обновление позиции
+            state.playerX += state.velX;
+            state.playerY += state.velY;
+
+            // Запись позиции
+            recordFrame();
+
+            // Проверка столкновений
+            checkCollisions();
+
+            // Обновление позиции игрока
+            player.style.left = state.playerX + 'px';
+            player.style.top = state.playerY + 'px';
+
+            // Наклон при движении
+            // const tiltX = state.velX * 8;
+            // const tiltY = state.velY * 8;
+            // player.style.transform = `rotateX(${tiltY}deg) rotateY(${-tiltX}deg)`;
+
+            // В игровом цикле замените блок наклона на этот:
+            const isMoving = Math.abs(state.velX) > 0.1 || Math.abs(state.velY) > 0.1;
+
+            if (isMoving) {
+                // Добавляем класс с анимацией прыжка
+                if (!player.classList.contains('jumping')) {
+                    player.classList.add('jumping');
+                }
+
+                // Сохраняем наклон в сторону движения
+                // const tiltX = state.velX * 8;
+                // const tiltY = state.velY * 8;
+                // player.style.transform = `rotateX(${tiltY}deg) rotateY(${-tiltX}deg)`;
+            } else {
+                // Убираем анимацию при остановке
+                player.classList.remove('jumping');
+                player.style.transform = 'none';
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Запуск игры
+        initGame();
+        gameLoop();
+    </script>
+</body>
+
+</html>
